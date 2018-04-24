@@ -6,7 +6,7 @@ import { Service } from '../service';
 export type ICreditCard =
     factory.paymentMethod.paymentCard.creditCard.IUncheckedCardRaw | factory.paymentMethod.paymentCard.creditCard.IUncheckedCardTokenized;
 
-export type IScreenEventReservation = factory.reservation.event.IEventReservation<factory.event.individualScreeningEvent.IEvent>;
+export type IEventReservation = factory.reservation.event.IEventReservation<factory.event.IEvent>;
 
 /**
  * person service
@@ -159,19 +159,17 @@ export class PersonService extends Service {
     }
 
     /**
-     * 座席予約の所有権を検索する
+     * 所有権を検索する
      */
-    public async searchReservationOwnerships(params: {
-        /**
-         * person id
-         * basically specify 'me' to retrieve contacts of login user
-         */
-        personId: string;
-    }): Promise<factory.ownershipInfo.IOwnershipInfo<IScreenEventReservation>[]> {
+    public async searchOwnershipInfos<T extends factory.ownershipInfo.IGoodType>(
+        params: factory.ownershipInfo.ISearchConditions<T>
+    ): Promise<factory.ownershipInfo.IOwnershipInfo<T>[]> {
         return this.fetch({
-            uri: `/people/${params.personId}/ownershipInfos/reservation`,
+            uri: `/people/me/ownershipInfos/${params.goodType}`,
             method: 'GET',
-            qs: {},
+            qs: {
+                ownedAt: params.ownedAt
+            },
             expectedStatusCodes: [OK]
         });
     }

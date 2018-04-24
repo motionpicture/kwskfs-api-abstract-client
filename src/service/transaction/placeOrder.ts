@@ -24,37 +24,6 @@ export interface IAuthorizeAction {
 }
 
 /**
- * メニューアイテム承認アクションインターフェース
- */
-export interface IMenuItemAuthorizeAction {
-    typeOf: factory.actionType.AuthorizeAction;
-    object: {
-        identifier: string;
-        typeOf: 'Offer';
-        price: number;
-        priceCurrency: factory.priceCurrency;
-        offeredBy: {
-            typeOf: 'Restaurant';
-            name: string;
-            telephone: string;
-            url: string;
-            image: string;
-        };
-        itemOffered: {
-            identifier: string;
-            typeOf: 'MenuItem';
-            name: string;
-            description: string;
-        };
-    };
-    agent: any;
-    recipient: any;
-    purpose: factory.transaction.placeOrder.ITransaction;
-    result: {
-        price: number;
-    };
-}
-/**
  * 注文取引サービス
  */
 export class PlaceOrderTransactionService extends Service {
@@ -95,27 +64,27 @@ export class PlaceOrderTransactionService extends Service {
      * 取引に座席予約を追加する
      * @returns 座席予約承認アクション
      */
-    public async createSeatReservationAuthorization(params: {
+    public async createSeatEventReservationAuthorization(params: {
         /**
          * 取引ID
          */
         transactionId: string;
         /**
+         * イベントタイプ
+         */
+        eventType: factory.eventType;
+        /**
          * イベント識別子
          */
         eventIdentifier: string;
-        /**
-         * 座席販売情報
-         */
-        offers: factory.offer.seatReservation.IOffer[];
-    }): Promise<factory.action.authorize.seatReservation.IAction> {
+    }): Promise<factory.action.authorize.offer.eventReservation.seat.IAction> {
         return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/seatReservation`,
+            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/offer/eventReservation/seat`,
             method: 'POST',
             expectedStatusCodes: [CREATED],
             body: {
-                eventIdentifier: params.eventIdentifier,
-                offers: params.offers
+                eventType: params.eventType,
+                eventIdentifier: params.eventIdentifier
             }
         });
     }
@@ -123,7 +92,7 @@ export class PlaceOrderTransactionService extends Service {
     /**
      * 座席予約取消
      */
-    public async cancelSeatReservationAuthorization(params: {
+    public async cancelSeatEventReservationAuthorization(params: {
         /**
          * 取引ID
          */
@@ -134,43 +103,9 @@ export class PlaceOrderTransactionService extends Service {
         actionId: string;
     }): Promise<void> {
         return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/seatReservation/${params.actionId}`,
+            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/offer/eventReservation/seat/${params.actionId}`,
             method: 'DELETE',
             expectedStatusCodes: [NO_CONTENT]
-        });
-    }
-
-    /**
-     * 座席予約承認アクションの供給情報を変更する
-     * 完了ステータスの座席仮予約に対して券種変更する際に使用
-     * @returns 座席予約承認アクション
-     */
-    public async changeSeatReservationOffers(params: {
-        /**
-         * 取引ID
-         */
-        transactionId: string;
-        /**
-         * アクションID
-         */
-        actionId: string;
-        /**
-         * イベント識別子
-         */
-        eventIdentifier: string;
-        /**
-         * 座席販売情報
-         */
-        offers: factory.offer.seatReservation.IOffer[];
-    }): Promise<factory.action.authorize.seatReservation.IAction> {
-        return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/seatReservation/${params.actionId}`,
-            method: 'PATCH',
-            expectedStatusCodes: [OK],
-            body: {
-                eventIdentifier: params.eventIdentifier,
-                offers: params.offers
-            }
         });
     }
 
@@ -234,48 +169,6 @@ export class PlaceOrderTransactionService extends Service {
     }
 
     /**
-     * 決済方法として、ムビチケを追加する
-     * @returns 承認アクション
-     */
-    public async createMvtkAuthorization(params: {
-        /**
-         * 取引ID
-         */
-        transactionId: string;
-        /**
-         * ムビチケ情報
-         */
-        mvtk: factory.action.authorize.mvtk.IObject;
-    }): Promise<IAuthorizeAction> {
-        return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/mvtk`,
-            method: 'POST',
-            expectedStatusCodes: [CREATED],
-            body: params.mvtk
-        });
-    }
-
-    /**
-     * ムビチケ取消
-     */
-    public async cancelMvtkAuthorization(params: {
-        /**
-         * 取引ID
-         */
-        transactionId: string;
-        /**
-         * アクションID
-         */
-        actionId: string;
-    }): Promise<void> {
-        return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/mvtk/${params.actionId}`,
-            method: 'DELETE',
-            expectedStatusCodes: [NO_CONTENT]
-        });
-    }
-
-    /**
      * Pecorino口座のオーソリを取得する
      * @returns 承認アクション
      */
@@ -304,11 +197,13 @@ export class PlaceOrderTransactionService extends Service {
      */
     // tslint:disable-next-line:no-single-line-block-comment
     /* istanbul ignore next */
-    public async createMenuItemAuthorization(params: {
+    public async createMenuItemEventReservationAuthorization(params: {
         /**
          * 取引ID
          */
         transactionId: string;
+        eventType: factory.eventType;
+        eventIdentifier: string;
         /**
          * メニューアイテムID
          */
@@ -321,15 +216,22 @@ export class PlaceOrderTransactionService extends Service {
          * 数量
          */
         acceptedQuantity: number;
-    }): Promise<IMenuItemAuthorizeAction> {
+        /**
+         * 組織識別子
+         */
+        organizationIdentifier: string;
+    }): Promise<factory.action.authorize.offer.eventReservation.menuItem.IAction> {
         return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/menuItem`,
+            uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/offer/eventReservation/menuItem`,
             method: 'POST',
             expectedStatusCodes: [CREATED],
             body: {
                 menuItemIdentifier: params.menuItemIdentifier,
+                eventType: params.eventType,
+                eventIdentifier: params.eventIdentifier,
                 offerIdentifier: params.offerIdentifier,
-                acceptedQuantity: params.acceptedQuantity
+                acceptedQuantity: params.acceptedQuantity,
+                organizationIdentifier: params.organizationIdentifier
             }
         });
     }

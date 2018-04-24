@@ -1,31 +1,22 @@
-/**
- * 注文サービス
- *
- * @namespace service.order
- */
-
 import * as factory from '@motionpicture/kwskfs-factory';
 import { OK } from 'http-status';
 
 import { Service } from '../service';
 
 /**
- * order service
+ * 注文サービス
  */
 export class OrderService extends Service {
     /**
-     * 照会キーで注文情報を取得する
+     * 注文を検索する
      */
-    public async findByOrderInquiryKey(
-        /**
-         * 注文照会キー
-         */
-        params: factory.order.IOrderInquiryKey
-    ): Promise<factory.order.IOrder> {
+    public async search(
+        params: factory.order.ISearchConditions
+    ): Promise<factory.order.IOrder[]> {
         return this.fetch({
-            uri: '/orders/findByOrderInquiryKey',
-            method: 'POST',
-            body: params,
+            uri: '/orders',
+            method: 'GET',
+            qs: params,
             expectedStatusCodes: [OK]
         });
     }

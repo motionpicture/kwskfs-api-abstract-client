@@ -111,19 +111,6 @@ describe('person service', () => {
         sandbox.verify();
     });
 
-    it('クレジットカード削除の結果が期待通り', async () => {
-        const personId = 'me';
-        const data = [{}];
-        sandbox.mock(people).expects('fetch').once().resolves(data);
-
-        const result = await people.searchReservationOwnerships({
-            personId: personId
-        });
-
-        assert.deepEqual(result, data);
-        sandbox.verify();
-    });
-
     it('口座照会の結果が期待通り', async () => {
         const personId = 'me';
         const data = {};
