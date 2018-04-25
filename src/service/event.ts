@@ -1,36 +1,37 @@
-// import * as factory from '@motionpicture/kwskfs-factory';
-// import { OK } from 'http-status';
+import * as factory from '@motionpicture/kwskfs-factory';
+import { OK } from 'http-status';
 
 import { Service } from '../service';
+
+export type IEvent<T> =
+    T extends factory.eventType.FoodEvent ? factory.event.food.IEvent :
+    T extends factory.eventType.SportsEvent ? factory.event.sports.IEvent :
+    factory.event.IEvent;
 
 /**
  * event service
  */
 export class EventService extends Service {
     /**
-     * 上映イベント検索
+     * 組織検索
      */
-    // public async searchIndividualScreeningEvent(
-    //     params: factory.event.individualScreeningEvent.ISearchConditions
-    // ): Promise<factory.event.individualScreeningEvent.IEventWithOffer[]> {
-    //     return this.fetch({
-    //         uri: '/events/individualScreeningEvent',
-    //         method: 'GET',
-    //         qs: params,
-    //         expectedStatusCodes: [OK]
-    //     });
-    // }
-
-    /**
-     * 上映イベント情報取得
-     */
-    // public async findIndividualScreeningEvent(params: {
-    //     identifier: string;
-    // }): Promise<factory.event.individualScreeningEvent.IEventWithOffer> {
-    //     return this.fetch({
-    //         uri: `/events/individualScreeningEvent/${params.identifier}`,
-    //         method: 'GET',
-    //         expectedStatusCodes: [OK]
-    //     });
-    // }
+    // tslint:disable-next-line:no-single-line-block-comment
+    /* istanbul ignore next */
+    public async search<T extends factory.eventType>(
+        /**
+         * 検索条件
+         */
+        params: {
+            eventType: T;
+            identifiers: string[];
+            limit: number;
+        }
+    ): Promise<IEvent<T>[]> {
+        return this.fetch({
+            uri: `/events/${params.eventType}`,
+            method: 'GET',
+            qs: params,
+            expectedStatusCodes: [OK]
+        });
+    }
 }
