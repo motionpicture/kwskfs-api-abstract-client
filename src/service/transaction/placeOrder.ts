@@ -181,13 +181,23 @@ export class PlaceOrderTransactionService extends Service {
          * 金額
          */
         price: number;
+        /**
+         * 引き出し元口座ID
+         */
+        fromAccountId: string;
+        /**
+         * 取引メモ
+         */
+        notes?: string;
     }): Promise<IAuthorizeAction> {
         return this.fetch({
             uri: `/transactions/placeOrder/${params.transactionId}/actions/authorize/pecorino`,
             method: 'POST',
             expectedStatusCodes: [CREATED],
             body: {
-                price: params.price
+                price: params.price,
+                fromAccountId: params.fromAccountId,
+                notes: params.notes
             }
         });
     }

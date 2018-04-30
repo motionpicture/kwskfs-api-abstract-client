@@ -123,15 +123,44 @@ export class PersonService extends Service {
     }
 
     /**
-     * 口座照会
+     * 口座開設
      */
-    public async findAccount(params: {
+    public async openAccount(params: {
         /**
          * person id
          * basically specify 'me' to retrieve contacts of login user
          */
         personId: string;
-    }): Promise<any> {
+        /**
+         * 口座名義
+         */
+        name: string;
+        /**
+         * 初期金額
+         */
+        initialBalance?: number;
+    }): Promise<factory.pecorino.account.IAccount> {
+        return this.fetch({
+            uri: `/people/${params.personId}/accounts`,
+            method: 'POST',
+            body: {
+                name: params.name,
+                initialBalance: params.initialBalance
+            },
+            expectedStatusCodes: [CREATED]
+        });
+    }
+
+    /**
+     * 口座照会
+     */
+    public async findAccounts(params: {
+        /**
+         * person id
+         * basically specify 'me' to retrieve contacts of login user
+         */
+        personId: string;
+    }): Promise<factory.pecorino.account.IAccount[]> {
         return this.fetch({
             uri: `/people/${params.personId}/accounts`,
             method: 'GET',
@@ -143,15 +172,19 @@ export class PersonService extends Service {
     /**
      * 口座取引履歴検索
      */
-    public async searchAccountTradeActions(params: {
+    public async searchAccountMoneyTransferActions(params: {
         /**
          * person id
          * basically specify 'me' to retrieve contacts of login user
          */
         personId: string;
-    }): Promise<any[]> {
+        /**
+         * 口座ID
+         */
+        accountId: string;
+    }): Promise<factory.pecorino.action.transfer.moneyTransfer.IAction[]> {
         return this.fetch({
-            uri: `/people/${params.personId}/accounts/actions/trade`,
+            uri: `/people/${params.personId}/accounts/${params.accountId}/actions/moneyTransfer`,
             method: 'GET',
             qs: {},
             expectedStatusCodes: [OK]
