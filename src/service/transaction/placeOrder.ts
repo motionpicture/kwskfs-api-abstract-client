@@ -1,6 +1,5 @@
 /**
  * 注文取引サービス
- * @namespace service.transaction.placeOrder
  */
 
 import * as factory from '@motionpicture/kwskfs-factory';
@@ -286,24 +285,17 @@ export class PlaceOrderTransactionService extends Service {
     }
 
     /**
-     * 確定した取引に関して、購入者にメール通知を送信する
-     * @returns メール送信タスク
+     * 明示的に取引を中止する
+     * 既に確定済、あるいは、期限切れの取引に対して実行するとNotFoundエラーが返されます。
+     * @param params.transactionId 取引ID
      */
-    public async sendEmailNotification(params: {
-        /**
-         * 取引ID
-         */
+    public async cancel(params: {
         transactionId: string;
-        /**
-         * Eメールメッセージ属性
-         */
-        emailMessageAttributes: factory.creativeWork.message.email.IAttributes;
-    }): Promise<factory.task.sendEmailMessage.ITask> {
+    }): Promise<void> {
         return this.fetch({
-            uri: `/transactions/placeOrder/${params.transactionId}/tasks/sendEmailNotification`,
+            uri: `/transactions/placeOrder/${params.transactionId}/cancel`,
             method: 'POST',
-            expectedStatusCodes: [CREATED],
-            body: params.emailMessageAttributes
+            expectedStatusCodes: [NO_CONTENT]
         });
     }
 }

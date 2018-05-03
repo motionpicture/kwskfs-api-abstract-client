@@ -1,10 +1,9 @@
 /**
  * 注文返品取引サービス
- * @namespace service.transaction.returnOrder
  */
 
 import * as factory from '@motionpicture/kwskfs-factory';
-import { CREATED, OK } from 'http-status';
+import { CREATED, NO_CONTENT, OK } from 'http-status';
 
 import { Service } from '../../service';
 
@@ -52,6 +51,21 @@ export class ReturnOrderTransactionService extends Service {
             uri: `/transactions/returnOrder/${params.transactionId}/confirm`,
             method: 'POST',
             expectedStatusCodes: [CREATED]
+        });
+    }
+
+    /**
+     * 明示的に取引を中止する
+     * 既に確定済、あるいは、期限切れの取引に対して実行するとNotFoundエラーが返されます。
+     * @param params.transactionId 取引ID
+     */
+    public async cancel(params: {
+        transactionId: string;
+    }): Promise<void> {
+        return this.fetch({
+            uri: `/transactions/returnOrder/${params.transactionId}/cancel`,
+            method: 'POST',
+            expectedStatusCodes: [NO_CONTENT]
         });
     }
 }
