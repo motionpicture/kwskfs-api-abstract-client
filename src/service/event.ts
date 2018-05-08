@@ -101,7 +101,6 @@ export class EventService extends Service {
             // tslint:disable-next-line:max-line-length
             uri: `/events/${params.eventType}/${params.eventIdentifier}/offers/${params.organizationId}/menuItem/${params.menuItemIdentifier}/${params.offerIdentifier}/availability/${params.availability}`,
             method: 'PUT',
-            qs: params,
             expectedStatusCodes: [NO_CONTENT]
         });
     }
