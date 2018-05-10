@@ -276,11 +276,19 @@ export class PlaceOrderTransactionService extends Service {
          * 取引ID
          */
         transactionId: string;
+        /**
+         * 注文メールを送信するかどうか
+         * デフォルトはfalse
+         */
+        sendEmailMessage?: boolean;
     }): Promise<factory.order.IOrder> {
         return this.fetch({
             uri: `/transactions/placeOrder/${params.transactionId}/confirm`,
             method: 'POST',
-            expectedStatusCodes: [CREATED]
+            expectedStatusCodes: [CREATED],
+            body: {
+                sendEmailMessage: params.sendEmailMessage
+            }
         });
     }
 
